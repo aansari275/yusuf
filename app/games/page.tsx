@@ -12,6 +12,7 @@ import CandyCatch from "../components/games/CandyCatch";
 import MemoryMatch from "../components/games/MemoryMatch";
 import SnakeGame from "../components/games/SnakeGame";
 import BrickBreaker from "../components/games/BrickBreaker";
+import DinosaurLand from "../components/games/DinosaurLand";
 
 const games = [
   { id: "racing", name: "🏎️ Speed Racer", description: "Dodge cars and go fast!", color: "from-red-500 to-orange-500", component: RacingGame },
@@ -24,6 +25,7 @@ const games = [
   { id: "memory", name: "🧠 Memory Match", description: "Match the pairs!", color: "from-indigo-500 to-purple-500", component: MemoryMatch },
   { id: "snake", name: "🐍 Snake Feast", description: "Eat and grow longer!", color: "from-green-600 to-lime-500", component: SnakeGame },
   { id: "brick", name: "🧱 Brick Breaker", description: "Break all the bricks!", color: "from-blue-500 to-cyan-500", component: BrickBreaker },
+  { id: "dinosaur", name: "🦖 Dinosaur Land", description: "Survive the dino attack!", color: "from-green-600 to-amber-500", component: DinosaurLand },
 ];
 
 export default function GamesPage() {
