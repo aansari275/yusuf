@@ -60,7 +60,7 @@ export default function ColorSwitch() {
   const jump = useCallback(() => {
     if (gameState === "playing") {
       setBallVelocity(JUMP_FORCE);
-    } else if (gameState !== "playing") {
+    } else {
       startGame();
     }
   }, [gameState]);
