@@ -26,16 +26,25 @@ import GeometryJump from "../components/games/GeometryJump";
 import StackTower from "../components/games/StackTower";
 import BubbleShooter from "../components/games/BubbleShooter";
 import NinjaRunner from "../components/games/NinjaRunner";
+import SteeringRacer from "../components/games/SteeringRacer";
 
 const games = [
-  // Featured new game
+  // Featured new game - Steering Wheel Racing!
+  {
+    id: "steeringracer",
+    name: "🏎️ Turbo Racer",
+    description: "Turn the steering wheel with your fingers to race!",
+    color: "from-blue-600 to-cyan-500",
+    component: SteeringRacer,
+    featured: true,
+    isNew: true
+  },
   {
     id: "dinohunter",
     name: "🦖 Dino Hunter Thar",
     description: "Drive your Thar, shoot dinosaurs, avoid volcanoes!",
     color: "from-red-600 to-orange-600",
     component: DinoHunterThar,
-    featured: true,
     isNew: true
   },
   // New games
@@ -270,7 +279,7 @@ export default function GamesPage() {
                 Pick a game and have fun! 🎉
               </p>
               <p className="text-white/60 text-sm mt-2">
-                20 awesome games to play!
+                21 awesome games to play!
               </p>
             </div>
 
@@ -279,26 +288,26 @@ export default function GamesPage() {
               <div className="mb-8">
                 <button
                   onClick={() => setActiveGame(featuredGame.id)}
-                  className="w-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/30 transform hover:scale-[1.02] transition-all duration-300 text-white text-center group relative overflow-hidden"
+                  className="w-full bg-gradient-to-br from-blue-600 via-cyan-500 to-green-500 rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-blue-500/30 transform hover:scale-[1.02] transition-all duration-300 text-white text-center group relative overflow-hidden"
                 >
                   {/* Animated background effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
                   <div className="relative z-10">
                     <div className="text-5xl md:text-7xl mb-3 group-hover:animate-bounce flex justify-center gap-2">
-                      <span>🚗</span>
+                      <span>🏎️</span>
                       <span>💨</span>
-                      <span>🦖</span>
-                      <span>🌋</span>
+                      <span>🛞</span>
+                      <span>🏁</span>
                     </div>
                     <div className="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-2">
                       ⭐ FEATURED GAME
                     </div>
                     <h3 className="font-black text-2xl md:text-3xl mb-2">
-                      Dino Hunter Thar
+                      Turbo Racer
                     </h3>
                     <p className="text-lg opacity-90">
-                      Drive your Mahindra Thar through the jungle, shoot dinosaurs with your gun, and avoid the erupting volcanoes! 🔥
+                      Grab the steering wheel and turn it with your fingers to race through traffic! 🏁
                     </p>
                   </div>
                 </button>
@@ -372,7 +381,7 @@ export default function GamesPage() {
             <div className="mt-12 grid grid-cols-3 gap-4 text-center">
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
                 <div className="text-3xl md:text-4xl">🎮</div>
-                <div className="text-2xl font-bold text-white">20</div>
+                <div className="text-2xl font-bold text-white">21</div>
                 <div className="text-white/60 text-sm">Games</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
