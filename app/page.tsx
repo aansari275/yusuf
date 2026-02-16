@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -81,14 +82,14 @@ export default function Home() {
               About Me
               <span className="ml-2 group-hover:animate-spin inline-block">✨</span>
             </a>
-            <a
+            <Link
               href="/games"
               className="group bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 animate-pulse"
             >
               <span className="mr-2">🎮</span>
               Play Games!
               <span className="ml-2 group-hover:animate-bounce inline-block">🕹️</span>
-            </a>
+            </Link>
             <a
               href="#fun"
               className="group bg-gradient-to-r from-pink-500 to-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
@@ -217,12 +218,12 @@ export default function Home() {
                   </span>
                 ))}
               </div>
-              <a
+              <Link
                 href="/games"
                 className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-10 py-4 rounded-full font-black text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
                 🎮 PLAY NOW! 🎮
-              </a>
+              </Link>
             </div>
           </div>
         </div>
