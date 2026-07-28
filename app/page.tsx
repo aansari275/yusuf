@@ -1,279 +1,330 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
+import Confetti from "./components/home/Confetti";
+import JokeBox from "./components/home/JokeBox";
+import SillyMeter from "./components/home/SillyMeter";
+import { useYusuf } from "./lib/useYusuf";
+import { FACTS, LOVES } from "./lib/yusuf";
+
+/* Decorative stickers scattered behind the hero. Positions are fixed rather
+   than random so the static HTML and the browser always agree. */
+const FLOATERS = [
+  { emoji: "⭐", top: "12%", left: "6%", delay: "0s" },
+  { emoji: "🚀", top: "22%", right: "8%", delay: "1.2s" },
+  { emoji: "🦖", top: "62%", left: "9%", delay: "2.4s" },
+  { emoji: "🎈", bottom: "16%", right: "7%", delay: "0.6s" },
+  { emoji: "🌈", top: "44%", right: "4%", delay: "3s" },
+  { emoji: "🍫", bottom: "28%", left: "16%", delay: "1.8s" },
+];
+
+const FACT_COLORS = ["bg-sky", "bg-berry", "bg-mint", "bg-tangerine"];
+const LOVE_COLORS = [
+  "bg-grape",
+  "bg-mint",
+  "bg-sky",
+  "bg-tangerine",
+  "bg-berry",
+  "bg-sun",
+];
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const funFacts = [
-    { emoji: "🎂", label: "Age", value: "5" },
-    { emoji: "🏫", label: "School", value: "Shiv Nadar" },
-    { emoji: "🏠", label: "Lives In", value: "Noida" },
-    { emoji: "🍫", label: "Fav Food", value: "White Chocolate" },
-  ];
-
-  const sillyThings = [
-    "Making funny faces 🤪",
-    "Running around super fast 🏃‍♂️",
-    "Telling silly jokes 😂",
-    "Playing all day long 🎮",
-    "Being the funniest kid ever! 🌟",
-  ];
+  const { age, nextAge, nextAgeOrdinal, daysUntilBirthday, isBirthday, year } =
+    useYusuf();
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-        <div className="absolute bottom-40 right-1/4 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-6000"></div>
+    <main className="relative overflow-hidden">
+      {isBirthday && <Confetti />}
+
+      {/* Soft colour wash behind everything */}
+      <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
+        <div className="animate-drift absolute -left-24 top-10 h-80 w-80 rounded-full bg-sky/25 blur-3xl" />
+        <div className="animate-drift absolute -right-20 top-1/3 h-96 w-96 rounded-full bg-berry/20 blur-3xl [animation-delay:3s]" />
+        <div className="animate-drift absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-sun/25 blur-3xl [animation-delay:6s]" />
       </div>
 
-      {/* Floating Emojis */}
-      {mounted && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <span className="absolute text-4xl animate-float" style={{ top: "10%", left: "5%" }}>⭐</span>
-          <span className="absolute text-4xl animate-float animation-delay-1000" style={{ top: "20%", right: "10%" }}>🚀</span>
-          <span className="absolute text-4xl animate-float animation-delay-2000" style={{ top: "60%", left: "8%" }}>🦖</span>
-          <span className="absolute text-4xl animate-float animation-delay-3000" style={{ bottom: "20%", right: "5%" }}>🎈</span>
-          <span className="absolute text-4xl animate-float animation-delay-4000" style={{ top: "40%", right: "3%" }}>🌈</span>
-          <span className="absolute text-4xl animate-float animation-delay-5000" style={{ bottom: "30%", left: "15%" }}>🎉</span>
-        </div>
-      )}
-
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 text-center">
-        <div className="relative z-10">
-          {/* Animated Wave Emoji */}
-          <div className="text-6xl md:text-8xl mb-4 animate-wave inline-block">👋</div>
-
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-4">
-            <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient">
-              Hi, I&apos;m Yusuf!
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl lg:text-3xl text-gray-600 mb-6 font-medium">
-            I&apos;m <span className="text-blue-500 font-bold">5 years old</span> and I&apos;m{" "}
-            <span className="text-pink-500 font-bold">super silly!</span> 🤪
-          </p>
-
-          {/* Fun Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg mb-8 animate-bounce-slow">
-            <span className="text-2xl">🍫</span>
-            <span className="text-lg font-semibold text-gray-700">White Chocolate Lover!</span>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="#about"
-              className="group bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-            >
-              <span className="mr-2">🌟</span>
-              About Me
-              <span className="ml-2 group-hover:animate-spin inline-block">✨</span>
+      {/* ---------- Nav ---------- */}
+      <nav className="sticky top-0 z-30 border-b border-ink/5 bg-paper/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
+          <span className="text-lg font-extrabold sm:text-xl">
+            Yusuf <span aria-hidden="true">🦖</span>
+          </span>
+          <div className="flex items-center gap-1 text-sm font-bold sm:gap-2 sm:text-base">
+            <a className="rounded-full px-3 py-2 hover:bg-paper-deep" href="#about">
+              About
+            </a>
+            <a className="rounded-full px-3 py-2 hover:bg-paper-deep" href="#fun">
+              Fun
             </a>
             <Link
+              className="toy-button bg-mint !px-4 !py-2 !text-sm sm:!px-5 sm:!text-base"
               href="/games"
-              className="group bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 animate-pulse"
             >
-              <span className="mr-2">🎮</span>
-              Play Games!
-              <span className="ml-2 group-hover:animate-bounce inline-block">🕹️</span>
+              Games 🎮
             </Link>
-            <a
-              href="#fun"
-              className="group bg-gradient-to-r from-pink-500 to-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+          </div>
+        </div>
+      </nav>
+
+      {/* ---------- Hero ---------- */}
+      <section className="relative px-4 pb-10 pt-12 sm:pt-16">
+        <div aria-hidden="true">
+          {FLOATERS.map((floater, i) => (
+            <span
+              key={i}
+              className="animate-bob pointer-events-none absolute hidden text-4xl opacity-80 lg:block"
+              style={{
+                top: floater.top,
+                left: floater.left,
+                right: floater.right,
+                bottom: floater.bottom,
+                animationDelay: floater.delay,
+              }}
             >
-              <span className="mr-2">🤪</span>
-              Fun Stuff
-              <span className="ml-2 group-hover:animate-bounce inline-block">🎈</span>
+              {floater.emoji}
+            </span>
+          ))}
+        </div>
+
+        <div className="relative mx-auto max-w-3xl text-center">
+          <span className="animate-wave inline-block text-6xl sm:text-7xl" aria-hidden="true">
+            👋
+          </span>
+
+          <h1 className="mt-4 text-5xl font-black leading-[1.05] tracking-tight sm:text-7xl">
+            Hi, I&apos;m <span className="text-berry">Yusuf!</span>
+          </h1>
+
+          <p className="mx-auto mt-5 max-w-xl text-balance text-xl text-ink-soft sm:text-2xl">
+            I&apos;m the silliest kid in Noida, I love dinosaurs and fast cars, and I
+            could eat white chocolate all day. 🍫
+          </p>
+
+          {/* Age medallion — always current, never hardcoded */}
+          <div className="mt-10 flex flex-col items-center">
+            <div className="sticker relative flex h-48 w-48 flex-col items-center justify-center rounded-full sm:h-64 sm:w-64">
+              <span
+                className="absolute inset-2 rounded-full border-4 border-dashed border-sun/70"
+                aria-hidden="true"
+              />
+              <span className="text-8xl font-black leading-none text-berry sm:text-9xl">
+                {age}
+              </span>
+              <span className="mt-1 text-lg font-extrabold text-ink-soft sm:text-xl">
+                years old
+              </span>
+            </div>
+
+            <p className="mt-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-base font-extrabold shadow-[0_4px_0_var(--shadow-warm)] sm:text-lg">
+              <span className="text-2xl" aria-hidden="true">
+                🎂
+              </span>
+              {isBirthday ? (
+                <>It&apos;s my birthday today! I&apos;m {age}!</>
+              ) : (
+                <>
+                  {daysUntilBirthday} {daysUntilBirthday === 1 ? "sleep" : "sleeps"}{" "}
+                  until I turn {nextAge}!
+                </>
+              )}
+            </p>
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Link href="/games" className="toy-button bg-berry text-xl">
+              🎮 Play my games
+            </Link>
+            <a href="#about" className="toy-button bg-sky">
+              🌟 About me
             </a>
           </div>
         </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 animate-bounce">
-          <span className="text-4xl">👇</span>
-        </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="relative py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-black text-center mb-12">
-            <span className="bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">
-              Fun Facts About Me! 🎯
-            </span>
+      {/* ---------- Facts ---------- */}
+      <section id="about" className="scroll-mt-20 px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-center text-4xl font-black sm:text-5xl">
+            All about me <span aria-hidden="true">🎯</span>
           </h2>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-            {funFacts.map((fact, index) => (
-              <div
-                key={index}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 text-center shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
-              >
-                <span className="text-5xl mb-3 block">{fact.emoji}</span>
-                <p className="text-gray-500 text-sm font-medium mb-1">{fact.label}</p>
-                <p className="text-2xl font-black text-gray-800">{fact.value}</p>
+          <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+            {FACTS.map((fact, i) => (
+              <div key={fact.label} className="sticker-button p-6 text-center">
+                <span
+                  className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl text-3xl ${FACT_COLORS[i % FACT_COLORS.length]}`}
+                  aria-hidden="true"
+                >
+                  {fact.emoji}
+                </span>
+                <p className="mt-4 text-sm font-bold uppercase tracking-wide text-ink-soft">
+                  {fact.label}
+                </p>
+                <p className="mt-1 text-xl font-black leading-tight">{fact.value}</p>
               </div>
             ))}
           </div>
 
-          {/* About Card */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-2xl max-w-4xl mx-auto">
-            <div className="text-center">
-              <span className="text-6xl mb-6 block">🏠</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-                From <span className="text-orange-500">Bhadohi</span> to{" "}
-                <span className="text-blue-500">Noida</span>!
-              </h3>
-              <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
-                I live in <strong className="text-blue-600">Noida</strong> with my family,
-                but I&apos;m originally from <strong className="text-orange-600">Bhadohi</strong>!
-                I go to <strong className="text-purple-600">Shiv Nadar School</strong> where
-                I learn lots of cool things and make tons of friends! 🏫✨
-              </p>
+          {/* Bhadohi to Noida */}
+          <div className="sticker mt-6 overflow-hidden p-8 sm:p-12">
+            <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
+              <span className="text-6xl sm:text-7xl" aria-hidden="true">
+                🏠
+              </span>
+              <div>
+                <h3 className="text-2xl font-black sm:text-3xl">
+                  From <span className="text-tangerine">Bhadohi</span> to{" "}
+                  <span className="text-sky">Noida</span>
+                </h3>
+                <p className="mt-3 text-lg leading-relaxed text-ink-soft">
+                  My family is from <strong className="text-ink">Bhadohi</strong>, the
+                  town famous for beautiful carpets. Now I live in{" "}
+                  <strong className="text-ink">Noida</strong> and I go to{" "}
+                  <strong className="text-ink">Shiv Nadar School</strong>, where I learn
+                  cool stuff and have loads of friends.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Fun Stuff Section */}
-      <section id="fun" className="relative py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-black text-center mb-12">
-            <span className="bg-gradient-to-r from-pink-500 to-yellow-500 bg-clip-text text-transparent">
-              Why I&apos;m Super Silly! 🤪
-            </span>
+      {/* ---------- Things I love ---------- */}
+      <section id="fun" className="scroll-mt-20 px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-center text-4xl font-black sm:text-5xl">
+            Things I love <span aria-hidden="true">💛</span>
           </h2>
 
-          {/* Silly Things List */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {sillyThings.map((thing, index) => (
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            {LOVES.map((love, i) => (
               <div
-                key={index}
-                className="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:rotate-1 transition-all duration-300"
+                key={love.title}
+                className={`sticker-button p-6 text-white ${LOVE_COLORS[i % LOVE_COLORS.length]}`}
               >
-                <p className="text-xl font-bold text-center">{thing}</p>
+                <span className="text-5xl" aria-hidden="true">
+                  {love.emoji}
+                </span>
+                <h3 className="mt-3 text-2xl font-black">{love.title}</h3>
+                <p className="mt-1 text-lg font-semibold opacity-90">{love.note}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Big Fun Statement */}
-          <div className="mt-16 text-center">
-            <div className="inline-block bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-10 py-6 rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <p className="text-2xl md:text-3xl font-black">
-                🎮 I LOVE PLAYING! 🎮
-              </p>
-              <p className="text-lg mt-2 opacity-90">
-                Playing is my favorite thing in the whole world!
-              </p>
-            </div>
+      {/* ---------- Play with me ---------- */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-center text-4xl font-black sm:text-5xl">
+            Play with me <span aria-hidden="true">🎲</span>
+          </h2>
+          <p className="mt-3 text-center text-lg text-ink-soft">
+            Two things to press. Go on, press them.
+          </p>
+
+          <div className="mt-10 space-y-6">
+            <SillyMeter />
+            <JokeBox />
           </div>
         </div>
       </section>
 
-      {/* Games Arcade Section */}
-      <section className="relative py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 md:p-12 shadow-2xl text-center text-white overflow-hidden relative">
-            {/* Animated stars */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-                  style={{
-                    top: `${Math.random() * 100}%`,
-                    left: `${Math.random() * 100}%`,
-                    animationDelay: `${Math.random() * 2}s`,
-                  }}
-                />
-              ))}
+      {/* ---------- Arcade ---------- */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-4xl">
+          <div className="sticker relative overflow-hidden bg-ink p-10 text-center text-white sm:p-14">
+            <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden="true">
+              <div className="absolute -left-10 -top-10 h-56 w-56 rounded-full bg-grape blur-3xl" />
+              <div className="absolute -bottom-12 -right-8 h-56 w-56 rounded-full bg-sky blur-3xl" />
             </div>
 
-            <div className="relative z-10">
-              <div className="text-6xl md:text-7xl mb-4 animate-bounce">🕹️</div>
-              <h2 className="text-3xl md:text-4xl font-black mb-4">
-                Yusuf&apos;s Game Arcade!
-              </h2>
-              <p className="text-xl mb-6 opacity-90">
-                10 super fun games to play!
+            <div className="relative">
+              <span className="animate-bob inline-block text-6xl sm:text-7xl" aria-hidden="true">
+                🕹️
+              </span>
+              <h2 className="mt-4 text-4xl font-black sm:text-5xl">Yusuf&apos;s Arcade</h2>
+              <p className="mx-auto mt-3 max-w-md text-lg text-white/80">
+                21 games I picked myself — racing, dinosaurs, ninjas and loads more.
+                Free to play, right here.
               </p>
-              <div className="flex flex-wrap justify-center gap-2 mb-6">
-                {["🏎️", "🚀", "🐦", "🥊", "🦖", "🎈", "🍬", "🧠", "🐍", "🧱"].map((emoji, i) => (
-                  <span key={i} className="text-3xl animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}>
-                    {emoji}
-                  </span>
-                ))}
+
+              <div className="mt-6 flex flex-wrap justify-center gap-2 text-3xl" aria-hidden="true">
+                {["🏎️", "🚀", "🐦", "🥊", "🦖", "🎈", "🍬", "🧠", "🐍", "🧱"].map(
+                  (emoji, i) => (
+                    <span
+                      key={i}
+                      className="animate-bob inline-block"
+                      style={{ animationDelay: `${i * 0.12}s` }}
+                    >
+                      {emoji}
+                    </span>
+                  ),
+                )}
               </div>
-              <Link
-                href="/games"
-                className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-10 py-4 rounded-full font-black text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-              >
-                🎮 PLAY NOW! 🎮
+
+              <Link href="/games" className="toy-button mt-8 bg-sun text-xl !text-ink">
+                Play now! 🎮
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Favorite Food Section */}
-      <section className="relative py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl p-12 shadow-2xl">
-            <span className="text-8xl mb-6 block animate-wiggle">🍫</span>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-800 mb-4">
-              My Favorite Food
-            </h2>
-            <p className="text-5xl md:text-6xl font-black bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent">
-              White Chocolate!
-            </p>
-            <p className="text-xl text-gray-600 mt-4">
-              It&apos;s so yummy and sweet! 😋
-            </p>
+      {/* ---------- Birthday countdown ---------- */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-3xl">
+          <div className="sticker bg-paper-deep p-10 text-center sm:p-12">
+            <span className="animate-wiggle inline-block text-6xl" aria-hidden="true">
+              🎂
+            </span>
+            {isBirthday ? (
+              <>
+                <h2 className="mt-4 text-4xl font-black sm:text-5xl">
+                  It&apos;s my birthday!
+                </h2>
+                <p className="mt-3 text-xl font-bold text-ink-soft">
+                  I&apos;m {age} today. Thank you for visiting! 🎉
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="mt-4 text-4xl font-black sm:text-5xl">
+                  My birthday is 1st June
+                </h2>
+                <p className="mt-4 text-2xl font-extrabold">
+                  <span className="block text-6xl text-berry sm:text-7xl">
+                    {daysUntilBirthday}
+                  </span>
+                  {daysUntilBirthday === 1 ? "sleep" : "sleeps"} until my{" "}
+                  {nextAgeOrdinal} birthday!
+                </p>
+              </>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Animated Emojis */}
-          <div className="flex justify-center gap-4 mb-6">
-            {["🌟", "🚀", "🦖", "🎈", "🍫", "🎉"].map((emoji, index) => (
+      {/* ---------- Footer ---------- */}
+      <footer className="px-4 pb-14 pt-6 text-center">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex justify-center gap-3 text-3xl" aria-hidden="true">
+            {["🌟", "🚀", "🦖", "🎈", "🍫", "🎉"].map((emoji, i) => (
               <span
-                key={index}
-                className="text-3xl animate-bounce"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                key={i}
+                className="animate-bob inline-block"
+                style={{ animationDelay: `${i * 0.15}s` }}
               >
                 {emoji}
               </span>
             ))}
           </div>
 
-          <p className="text-gray-600 text-lg">
-            Made with <span className="text-red-500">💖</span> for{" "}
-            <span className="font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-              Yusuf Ansari
-            </span>
+          <p className="mt-6 text-lg font-bold">
+            Made with <span className="text-berry">💖</span> for Yusuf Ansari
           </p>
-
-          <div className="mt-4 h-1 w-40 mx-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
-
-          <p className="text-gray-400 text-sm mt-4">
-            © 2025 Yusuf Ansari • The Silliest Kid Ever! 🤪
+          <p className="mt-2 text-sm text-ink-soft">
+            © {year} mdyusuf.com — the silliest website on the internet 🤪
           </p>
         </div>
       </footer>

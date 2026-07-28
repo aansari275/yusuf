@@ -193,6 +193,31 @@ const games = [
   },
 ];
 
+/*
+ * A fixed pseudo-random starfield. Seeded (with Yusuf's birthday) so the
+ * pre-rendered HTML and the browser produce identical markup — plain
+ * Math.random() here caused a hydration mismatch in the static export.
+ */
+function seededRandom(seed: number) {
+  let state = seed;
+  return () => {
+    state = (state * 1664525 + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+}
+
+const STARS = (() => {
+  const rand = seededRandom(20200601);
+  return Array.from({ length: 70 }, () => ({
+    top: rand() * 100,
+    left: rand() * 100,
+    size: rand() > 0.7 ? 3 : 2,
+    gold: rand() > 0.5,
+    delay: rand() * 3,
+    duration: 1 + rand() * 2,
+  }));
+})();
+
 export default function GamesPage() {
   const [activeGame, setActiveGame] = useState<string | null>(null);
   const ActiveGameComponent = games.find(g => g.id === activeGame)?.component;
@@ -203,53 +228,44 @@ export default function GamesPage() {
   const featuredGame = games.find(g => g.featured);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
-      {/* Animated Stars Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(80)].map((_, i) => (
+    <main className="min-h-screen overflow-hidden bg-ink">
+      {/* Night-sky starfield */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        {STARS.map((star, i) => (
           <div
             key={i}
-            className="absolute rounded-full animate-pulse"
+            className="absolute animate-pulse rounded-full"
             style={{
-              width: Math.random() > 0.7 ? "3px" : "2px",
-              height: Math.random() > 0.7 ? "3px" : "2px",
-              backgroundColor: Math.random() > 0.5 ? "#fff" : "#ffd700",
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${1 + Math.random() * 2}s`,
+              width: star.size,
+              height: star.size,
+              backgroundColor: star.gold ? "#ffc53d" : "#ffffff",
+              top: `${star.top}%`,
+              left: `${star.left}%`,
+              animationDelay: `${star.delay}s`,
+              animationDuration: `${star.duration}s`,
             }}
           />
         ))}
-      </div>
-
-      {/* Floating Particles */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={`particle-${i}`}
-            className="absolute w-2 h-2 bg-yellow-400/30 rounded-full animate-bounce"
-            style={{
-              top: `${20 + Math.random() * 60}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-            }}
-          />
-        ))}
+        <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-grape/30 blur-3xl" />
+        <div className="absolute -right-24 bottom-1/4 h-80 w-80 rounded-full bg-sky/25 blur-3xl" />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 py-6 px-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-white hover:text-yellow-300 transition-colors flex items-center gap-2 group">
-            <span className="text-2xl group-hover:-translate-x-1 transition-transform">👈</span>
-            <span className="font-bold">Back Home</span>
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-ink/80 px-4 py-3 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+          <Link
+            href="/"
+            className="group flex items-center gap-2 rounded-full px-3 py-2 font-bold text-white transition-colors hover:bg-white/10"
+          >
+            <span className="text-xl transition-transform group-hover:-translate-x-1" aria-hidden="true">
+              👈
+            </span>
+            <span className="hidden sm:inline">Back home</span>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-black text-white drop-shadow-lg">
-            <span className="text-yellow-400 animate-pulse">🎮</span> Yusuf&apos;s Arcade <span className="text-yellow-400 animate-pulse">🎮</span>
+          <h1 className="text-xl font-black text-white sm:text-3xl">
+            <span aria-hidden="true">🎮</span> Yusuf&apos;s Arcade
           </h1>
-          <div className="w-24"></div>
+          <div className="w-10 sm:w-28" />
         </div>
       </header>
 
@@ -259,9 +275,12 @@ export default function GamesPage() {
           <div className="max-w-4xl mx-auto">
             <button
               onClick={() => setActiveGame(null)}
-              className="mb-4 bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-full font-bold transition-all hover:scale-105 flex items-center gap-2"
+              className="toy-button mb-4 bg-white/15 !px-5 !py-2 !text-base"
             >
-              <span className="text-lg">←</span> Back to Games
+              <span className="text-lg" aria-hidden="true">
+                ←
+              </span>{" "}
+              Back to games
             </button>
             <div className={`bg-gradient-to-br ${activeGameData?.color || "from-gray-800 to-gray-900"} rounded-3xl p-1`}>
               <div className="bg-black/70 backdrop-blur-sm rounded-[22px] p-4 md:p-6 shadow-2xl">
@@ -274,12 +293,12 @@ export default function GamesPage() {
         /* Games Grid */
         <div className="relative z-10 px-4 pb-12">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <p className="text-white/90 text-xl md:text-2xl font-medium">
+            <div className="mb-8 pt-8 text-center">
+              <p className="text-2xl font-extrabold text-white sm:text-3xl">
                 Pick a game and have fun! 🎉
               </p>
-              <p className="text-white/60 text-sm mt-2">
-                21 awesome games to play!
+              <p className="mt-2 font-semibold text-white/60">
+                {games.length} awesome games to play
               </p>
             </div>
 
@@ -316,8 +335,10 @@ export default function GamesPage() {
 
             {/* New Games Section */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">NEW</span>
+              <h2 className="mb-4 flex items-center gap-2 text-2xl font-black text-white">
+                <span className="rounded-full bg-mint px-2 py-1 text-xs font-black text-ink">
+                  NEW
+                </span>
                 Fresh Games 🎮
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
@@ -325,7 +346,7 @@ export default function GamesPage() {
                   <button
                     key={game.id}
                     onClick={() => setActiveGame(game.id)}
-                    className={`bg-gradient-to-br ${game.color} rounded-2xl p-4 md:p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-rotate-1 transition-all duration-300 text-white text-center group relative overflow-hidden`}
+                    className={`bg-gradient-to-br ${game.color} group relative overflow-hidden rounded-[28px] p-4 text-center text-white shadow-[0_6px_0_rgba(0,0,0,0.35)] transition-transform duration-150 ease-out hover:-translate-y-1 active:translate-y-1 active:shadow-[0_2px_0_rgba(0,0,0,0.35)] md:p-6`}
                   >
                     {/* NEW badge */}
                     <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -350,15 +371,13 @@ export default function GamesPage() {
 
             {/* Classic Games Section */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Classic Games 🕹️
-              </h2>
+              <h2 className="mb-4 text-2xl font-black text-white">Classic Games 🕹️</h2>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
                 {originalGames.map((game) => (
                   <button
                     key={game.id}
                     onClick={() => setActiveGame(game.id)}
-                    className={`bg-gradient-to-br ${game.color} rounded-2xl p-4 md:p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-rotate-1 transition-all duration-300 text-white text-center group relative overflow-hidden`}
+                    className={`bg-gradient-to-br ${game.color} group relative overflow-hidden rounded-[28px] p-4 text-center text-white shadow-[0_6px_0_rgba(0,0,0,0.35)] transition-transform duration-150 ease-out hover:-translate-y-1 active:translate-y-1 active:shadow-[0_2px_0_rgba(0,0,0,0.35)] md:p-6`}
                   >
                     {/* Shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -379,30 +398,31 @@ export default function GamesPage() {
 
             {/* Fun Stats */}
             <div className="mt-12 grid grid-cols-3 gap-4 text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="text-3xl md:text-4xl">🎮</div>
-                <div className="text-2xl font-bold text-white">21</div>
-                <div className="text-white/60 text-sm">Games</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="text-3xl md:text-4xl">⭐</div>
-                <div className="text-2xl font-bold text-white">∞</div>
-                <div className="text-white/60 text-sm">Fun</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="text-3xl md:text-4xl">🏆</div>
-                <div className="text-2xl font-bold text-white">You!</div>
-                <div className="text-white/60 text-sm">Champion</div>
-              </div>
+              {[
+                { emoji: "🎮", value: String(games.length), label: "Games" },
+                { emoji: "⭐", value: "∞", label: "Fun" },
+                { emoji: "🏆", value: "You!", label: "Champion" },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-[28px] bg-white/10 p-4 backdrop-blur-sm"
+                >
+                  <div className="text-3xl md:text-4xl" aria-hidden="true">
+                    {stat.emoji}
+                  </div>
+                  <div className="text-2xl font-black text-white">{stat.value}</div>
+                  <div className="text-sm font-semibold text-white/60">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 text-center">
-        <p className="text-white/60">Made with 💖 for Yusuf</p>
-        <p className="text-white/40 text-sm mt-1">Have fun playing! 🎉</p>
+      <footer className="relative z-10 py-8 text-center">
+        <p className="font-bold text-white/70">Made with 💖 for Yusuf</p>
+        <p className="mt-1 text-sm text-white/40">Have fun playing! 🎉</p>
       </footer>
     </main>
   );

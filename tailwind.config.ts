@@ -8,18 +8,34 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        paper: "#fff6e9",
+        "paper-deep": "#ffeacf",
+        ink: "#2b2140",
+        "ink-soft": "#6b5f80",
+        sun: "#ffc53d",
+        sky: "#41b6ff",
+        berry: "#ff5c7a",
+        mint: "#22cca0",
+        grape: "#9b6bff",
+        tangerine: "#ff9143",
+      },
+      fontFamily: {
+        rounded: [
+          "ui-rounded",
+          "SF Pro Rounded",
+          "Hiragino Maru Gothic ProN",
+          "Quicksand",
+          "Nunito",
+          "system-ui",
+          "sans-serif",
+        ],
       },
       animation: {
-        blob: "blob 7s infinite",
-        float: "float 3s ease-in-out infinite",
-        wave: "wave 2.5s infinite",
-        wiggle: "wiggle 1s ease-in-out infinite",
-        gradient: "gradient 3s ease infinite",
-        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        bob: "bob 3.2s ease-in-out infinite",
+        drift: "drift 9s ease-in-out infinite",
+        wave: "wave 2.6s ease-in-out infinite",
+        wiggle: "wiggle 1.4s ease-in-out infinite",
       },
     },
   },
