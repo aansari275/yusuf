@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  # `output: 'export'` in next.config.mjs writes a static site to out/, not .next
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "20"
