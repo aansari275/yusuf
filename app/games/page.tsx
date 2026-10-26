@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
 // Original games
 import RacingGame from "../components/games/RacingGame";
@@ -28,15 +29,35 @@ import BubbleShooter from "../components/games/BubbleShooter";
 import NinjaRunner from "../components/games/NinjaRunner";
 import SteeringRacer from "../components/games/SteeringRacer";
 
+// three.js is big, so the 3D game only downloads when someone opens it.
+const SkyRace3D = dynamic(() => import("../components/games/SkyRace3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex aspect-[4/5] w-full items-center justify-center rounded-3xl bg-sky/30 text-2xl font-black text-white sm:aspect-video">
+      ✈️ Getting the planes ready…
+    </div>
+  ),
+});
+
 const games = [
-  // Featured new game - Steering Wheel Racing!
+  // Featured new game - 3D plane racing!
+  {
+    id: "skyrace",
+    name: "✈️ Sky Race 3D",
+    description: "Fly your plane in 3D and race to the finish line!",
+    color: "from-sky-500 to-indigo-600",
+    component: SkyRace3D,
+    featured: true,
+    isNew: true,
+    heroEmojis: ["✈️", "☁️", "⭕", "🏁"],
+    heroText: "Tip your phone to fly! Zoom through rings, dodge balloons and race the other planes to the finish line! 🏁",
+  },
   {
     id: "steeringracer",
     name: "🏎️ Turbo Racer",
     description: "Turn the steering wheel with your fingers to race!",
     color: "from-blue-600 to-cyan-500",
     component: SteeringRacer,
-    featured: true,
     isNew: true
   },
   {
@@ -307,27 +328,24 @@ export default function GamesPage() {
               <div className="mb-8">
                 <button
                   onClick={() => setActiveGame(featuredGame.id)}
-                  className="w-full bg-gradient-to-br from-blue-600 via-cyan-500 to-green-500 rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-blue-500/30 transform hover:scale-[1.02] transition-all duration-300 text-white text-center group relative overflow-hidden"
+                  className="w-full bg-gradient-to-br from-sky-500 via-indigo-500 to-fuchsia-500 rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-blue-500/30 transform hover:scale-[1.02] transition-all duration-300 text-white text-center group relative overflow-hidden"
                 >
                   {/* Animated background effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
                   <div className="relative z-10">
                     <div className="text-5xl md:text-7xl mb-3 group-hover:animate-bounce flex justify-center gap-2">
-                      <span>🏎️</span>
-                      <span>💨</span>
-                      <span>🛞</span>
-                      <span>🏁</span>
+                      {featuredGame.heroEmojis?.map((e) => (
+                        <span key={e}>{e}</span>
+                      ))}
                     </div>
                     <div className="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-2">
                       ⭐ FEATURED GAME
                     </div>
                     <h3 className="font-black text-2xl md:text-3xl mb-2">
-                      Turbo Racer
+                      {featuredGame.name.split(" ").slice(1).join(" ")}
                     </h3>
-                    <p className="text-lg opacity-90">
-                      Grab the steering wheel and turn it with your fingers to race through traffic! 🏁
-                    </p>
+                    <p className="text-lg opacity-90">{featuredGame.heroText}</p>
                   </div>
                 </button>
               </div>
