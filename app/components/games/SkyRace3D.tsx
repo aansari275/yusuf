@@ -10,23 +10,40 @@ import { LEVELS, ordinal, starsForPlace } from "./skyRace3D/world";
 import { PLANES } from "./skyRace3D/models";
 
 const STORAGE_KEY = "yusuf:sky-race-3d:stars";
+const TROPHY_KEY = STORAGE_KEY.replace(":stars", ":trophies");
 const PLANE_KEY = "yusuf:sky-race-3d:plane";
 
 type Phase = "menu" | "racing" | "results";
 type TiltState = "off" | "waiting" | "on" | "unavailable";
 type HoldKey = "left" | "right" | "up" | "down";
 
-const EMPTY_HUD: Hud = { place: 1, rings: 0, ringsTotal: 0, racers: [], boost: false };
+const EMPTY_HUD: Hud = { place: 1, rings: 0, ringsTotal: 0, racers: [], boost: false, wind: 0 };
 const MEDALS = ["🥇", "🥈", "🥉", "🏅"];
 
-function loadStars(): number[] {
+// The first version had 5 worlds; this is where each of them sits in the new list of 10.
+const OLD_WORLDS = [0, 1, 3, 4, 7];
+
+function loadList(key: string): number[] {
   try {
-    const v = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    if (Array.isArray(v)) return LEVELS.map((_, i) => Number(v[i]) || 0);
+    const v = JSON.parse(localStorage.getItem(key) || "[]");
+    if (Array.isArray(v)) {
+      const out = LEVELS.map(() => 0);
+      if (v.length === OLD_WORLDS.length) v.forEach((n, i) => (out[OLD_WORLDS[i]] = Number(n) || 0));
+      else LEVELS.forEach((_, i) => (out[i] = Number(v[i]) || 0));
+      return out;
+    }
   } catch {
     /* private mode */
   }
   return LEVELS.map(() => 0);
+}
+
+function saveList(key: string, list: number[]) {
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch {
+    /* ignore */
+  }
 }
 
 export default function SkyRace3D() {
@@ -46,8 +63,11 @@ export default function SkyRace3D() {
   const [hud, setHud] = useState<Hud>(EMPTY_HUD);
   const [count, setCount] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [flash, setFlash] = useState<"ring" | "bonk" | null>(null);
+  const [flash, setFlash] = useState<"ring" | "bonk" | "lightning" | null>(null);
   const [stars, setStars] = useState<number[]>(() => LEVELS.map(() => 0));
+  const [trophies, setTrophies] = useState<number[]>(() => LEVELS.map(() => 0));
+  /** Set when this race opened up a brand-new world. */
+  const [unlockedNow, setUnlockedNow] = useState(false);
   const [plane, setPlane] = useState(0);
   const [levelIdx, setLevelIdx] = useState(0);
   const [result, setResult] = useState<RaceResult | null>(null);
@@ -62,7 +82,8 @@ export default function SkyRace3D() {
 
   // ── Engine lifecycle ──
   useEffect(() => {
-    setStars(loadStars());
+    setStars(loadList(STORAGE_KEY));
+    setTrophies(loadList(TROPHY_KEY));
     let savedPlane = 0;
     try {
       savedPlane = Math.min(PLANES.length - 1, Math.max(0, Number(localStorage.getItem(PLANE_KEY)) || 0));
@@ -77,9 +98,9 @@ export default function SkyRace3D() {
     if (!mount) return;
     let toastTimer: ReturnType<typeof setTimeout> | undefined;
     let flashTimer: ReturnType<typeof setTimeout> | undefined;
-    const pop = (kind: "ring" | "bonk", text: string) => {
+    const pop = (kind: "ring" | "bonk" | "lightning", text: string | null) => {
       setFlash(kind);
-      setToast(text);
+      if (text) setToast(text);
       clearTimeout(flashTimer);
       clearTimeout(toastTimer);
       flashTimer = setTimeout(() => setFlash(null), 250);
@@ -92,7 +113,8 @@ export default function SkyRace3D() {
         {
           onHud: setHud,
           onCount: setCount,
-          onRing: () => pop("ring", "Zoom! 🚀"),
+          onRing: (mega) => pop("ring", mega ? "MEGA TURBO! 🌈" : "Zoom! 🚀"),
+          onLightning: () => pop("lightning", null),
           onBonk: () => {
             pop("bonk", "Bonk! 🎈");
             if (navigator.vibrate) navigator.vibrate(120);
@@ -100,17 +122,22 @@ export default function SkyRace3D() {
           onFinish: (r) => {
             setResult(r);
             setPhase("results");
+            const lv = levelRef.current;
             setStars((old) => {
               const next = [...old];
-              const lv = levelRef.current;
+              setUnlockedNow(old[lv] === 0 && lv + 1 < LEVELS.length);
               next[lv] = Math.max(next[lv], starsForPlace(r.place));
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-              } catch {
-                /* ignore */
-              }
+              saveList(STORAGE_KEY, next);
               return next;
             });
+            if (r.rings >= r.goal) {
+              setTrophies((old) => {
+                const next = [...old];
+                next[lv] = 1;
+                saveList(TROPHY_KEY, next);
+                return next;
+              });
+            }
           },
         },
         isTouch,
@@ -250,7 +277,8 @@ export default function SkyRace3D() {
   }, []);
 
   // ── Game flow ──
-  const unlocked = (i: number) => i === 0 || stars[i - 1] > 0;
+  // Open if it is the first world, the one before it is finished, or it already has stars.
+  const unlocked = (i: number) => i === 0 || stars[i - 1] > 0 || stars[i] > 0;
 
   const pickPlane = (i: number) => {
     setPlane(i);
@@ -346,6 +374,10 @@ export default function SkyRace3D() {
           style={{ background: "radial-gradient(circle, rgba(255,197,61,0) 45%, rgba(255,197,61,0.45) 100%)" }}
         />
 
+        <div
+          className={`pointer-events-none absolute inset-0 bg-white transition-opacity duration-100 ${flash === "lightning" ? "opacity-60" : "opacity-0"}`}
+        />
+
         {phase === "racing" && (
           <>
             {/* Race progress: every plane on a line to the finish flag */}
@@ -375,7 +407,11 @@ export default function SkyRace3D() {
               </div>
               <span className={pill}>
                 ⭕ {hud.rings}/{hud.ringsTotal}
+                <span className="opacity-70"> · 🏆 {level.goal}</span>
               </span>
+              {hud.wind !== 0 && (
+                <span className={`${pill} animate-pulse`}>💨 Wind {hud.wind > 0 ? "➡️" : "⬅️"}</span>
+              )}
             </div>
 
             <div className="absolute right-3 top-10 flex flex-col gap-1.5 sm:top-3">
@@ -442,6 +478,13 @@ export default function SkyRace3D() {
         )}
 
         {/* 3… 2… 1… GO! */}
+        {count && phase === "racing" && (
+          <div className="pointer-events-none absolute inset-x-4 bottom-28 text-center sm:bottom-10">
+            <span className="inline-block rounded-2xl bg-black/55 px-4 py-2 text-lg text-white shadow-lg backdrop-blur-sm sm:text-2xl">
+              {level.emoji} World {levelIdx + 1}: {level.name} — {level.tip}
+            </span>
+          </div>
+        )}
         {count && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div
@@ -496,7 +539,7 @@ export default function SkyRace3D() {
               </div>
 
               <p className="mt-4 text-sm font-black uppercase tracking-wide text-sun">2. Tap a world to fly!</p>
-              <div className="mt-1 grid w-full grid-cols-3 gap-2 sm:grid-cols-5">
+              <div className="mt-1 grid w-full grid-cols-5 gap-1.5 sm:gap-2">
                 {LEVELS.map((lv, i) => {
                   const open = unlocked(i);
                   return (
@@ -505,18 +548,19 @@ export default function SkyRace3D() {
                       type="button"
                       onClick={() => startLevel(i)}
                       disabled={!open}
-                      className={`rounded-2xl p-2 font-extrabold shadow-[0_5px_0_rgba(0,0,0,0.35)] transition-transform ${
+                      className={`rounded-2xl p-1 sm:p-2 font-extrabold shadow-[0_5px_0_rgba(0,0,0,0.35)] transition-transform ${
                         open ? "bg-white text-ink hover:-translate-y-1 active:translate-y-1" : "cursor-not-allowed bg-white/30 text-white/70"
                       }`}
                     >
-                      <span className="block text-3xl sm:text-4xl" aria-hidden="true">
+                      <span className="block text-2xl sm:text-4xl" aria-hidden="true">
                         {open ? lv.emoji : "🔒"}
                       </span>
-                      <span className="block text-xs sm:text-sm">
+                      <span className="block text-[10px] leading-tight sm:text-sm">
                         {i + 1}. {lv.name}
                       </span>
-                      <span className="block text-sm leading-tight" aria-label={`${stars[i]} stars`}>
+                      <span className="block text-[10px] leading-tight sm:text-sm" aria-label={`${stars[i]} stars`}>
                         {open ? "⭐".repeat(stars[i]) + "☆".repeat(3 - stars[i]) : " "}
+                        {trophies[i] ? " 🏆" : ""}
                       </span>
                     </button>
                   );
@@ -553,6 +597,16 @@ export default function SkyRace3D() {
                 </span>
                 <span className={pill}>⏱️ {result.seconds} seconds</span>
               </div>
+              <p className="mt-2 text-base text-white sm:text-lg">
+                {result.rings >= result.goal
+                  ? `🏆 Ring Challenge done! ${result.rings} rings!`
+                  : `🏆 Ring Challenge: fly through ${result.goal} rings to win the trophy!`}
+              </p>
+              {unlockedNow && nextLevel !== null && (
+                <p className="animate-pop-in mt-1 text-lg text-emerald-300 sm:text-xl">
+                  🔓 New world unlocked: {LEVELS[nextLevel].emoji} {LEVELS[nextLevel].name}!
+                </p>
+              )}
               {result.place > 1 && (
                 <p className="mt-2 text-sm font-bold text-white/85">Tip: fly through more ⭕ rings to go faster!</p>
               )}

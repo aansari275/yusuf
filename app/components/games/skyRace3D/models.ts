@@ -75,10 +75,64 @@ export interface Lists {
 
 // ── Scenery ──────────────────────────────────────────────────────────────
 
-export function tree(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd) {
+export function tree(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd, leaves = 0x3f9a3a, top = 0x52b043) {
   part(L.props, GEO.cyl, vary(0x7a5230, rnd), x, y + 2 * k, z, 0.8 * k, 4 * k, 0.8 * k);
-  part(L.props, GEO.ico, vary(0x3f9a3a, rnd), x, y + 5.5 * k, z, 5 * k, 4.6 * k, 5 * k, rnd(), rnd(), 0);
-  part(L.props, GEO.ico, vary(0x52b043, rnd), x + 0.8 * k, y + 7.6 * k, z - 0.4 * k, 3.4 * k, 3.2 * k, 3.4 * k);
+  part(L.props, GEO.ico, vary(leaves, rnd), x, y + 5.5 * k, z, 5 * k, 4.6 * k, 5 * k, rnd(), rnd(), 0);
+  part(L.props, GEO.ico, vary(top, rnd), x + 0.8 * k, y + 7.6 * k, z - 0.4 * k, 3.4 * k, 3.2 * k, 3.4 * k);
+}
+
+const AUTUMN = [0xe0662b, 0xf0a030, 0xd8402f, 0xf2c94c, 0xb8542a];
+
+export function autumnTree(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd) {
+  const pick = () => AUTUMN[Math.floor(rnd() * AUTUMN.length)];
+  tree(L, x, y, z, k, rnd, pick(), pick());
+}
+
+export function pumpkin(L: Lists, x: number, y: number, z: number, k: number) {
+  part(L.props, GEO.sphere, 0xff8a1f, x, y + 1.2 * k, z, 3 * k, 2.3 * k, 3 * k);
+  part(L.props, GEO.cyl, 0x4f7a2a, x, y + 2.6 * k, z, 0.3 * k, 0.8 * k, 0.3 * k);
+}
+
+const CANDY = [0xff5c7a, 0xffc53d, 0x9b6bff, 0x22cca0, 0x41b6ff, 0xff9143];
+
+export function lollipop(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd) {
+  part(L.props, GEO.cyl, 0xffffff, x, y + 4 * k, z, 0.5 * k, 8 * k, 0.5 * k);
+  const c = CANDY[Math.floor(rnd() * CANDY.length)];
+  part(L.props, GEO.cyl, c, x, y + 9.5 * k, z, 6 * k, 1.2 * k, 6 * k, Math.PI / 2, rnd() * Math.PI, 0);
+  part(L.props, GEO.cyl, 0xffffff, x, y + 9.5 * k, z, 3 * k, 1.3 * k, 3 * k, Math.PI / 2, 0, 0);
+}
+
+export function gumdrop(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd) {
+  part(L.props, GEO.sphere, CANDY[Math.floor(rnd() * CANDY.length)], x, y + 1.5 * k, z, 4 * k, 3.6 * k, 4 * k);
+}
+
+export function volcano(L: Lists, x: number, y: number, z: number, k: number) {
+  part(L.props, GEO.cone, 0x4a3530, x, y + 15 * k, z, 44 * k, 30 * k, 44 * k);
+  part(L.glow, GEO.cyl, 0xff6a1a, x, y + 29.5 * k, z, 9 * k, 1.5 * k, 9 * k);
+}
+
+export function lavaPool(L: Lists, x: number, y: number, z: number, k: number) {
+  part(L.glow, GEO.cyl, 0xff7a22, x, y + 0.3, z, 10 * k, 0.4, 7 * k);
+}
+
+export function moonRock(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd) {
+  part(L.props, GEO.rock, vary(0x9a97a6, rnd), x, y + k * 0.4, z, k * 2.2, k * 1.4, k * 2, rnd(), rnd(), rnd());
+}
+
+export function rocket(L: Lists, x: number, y: number, z: number, k: number) {
+  part(L.props, GEO.cyl, 0xf4f4f8, x, y + 9 * k, z, 3 * k, 14 * k, 3 * k);
+  part(L.props, GEO.cone, 0xff5c7a, x, y + 18 * k, z, 3 * k, 4 * k, 3 * k);
+  for (let a = 0; a < 3; a++) {
+    const ang = (a / 3) * Math.PI * 2;
+    part(L.props, GEO.box, 0xff5c7a, x + Math.cos(ang) * 2 * k, y + 3 * k, z + Math.sin(ang) * 2 * k, 0.4 * k, 4 * k, 2 * k, 0, -ang, 0);
+  }
+  part(L.glow, GEO.sphere, 0x9fe3ff, x, y + 12 * k, z + 1.5 * k, 1.4 * k, 1.4 * k, 0.4 * k);
+}
+
+/** A huge glowing planet hanging in the sky, far away. */
+export function planet(L: Lists, x: number, y: number, z: number, r: number, color: number, ring: boolean) {
+  part(L.glow, GEO.sphere, color, x, y, z, r, r, r);
+  if (ring) part(L.glow, GEO.cyl, 0xe8d6a8, x, y, z, r * 1.9, 0.6, r * 1.9, 0.35, 0, 0.2);
 }
 
 export function pine(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd, snowy: boolean) {
@@ -155,10 +209,10 @@ export function building(L: Lists, x: number, z: number, w: number, h: number, d
   if (rnd() < 0.3) part(L.glow, GEO.sphere, 0xff3b3b, x, h + 2, z, 1, 1, 1);
 }
 
-export function cloud(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd) {
+export function cloud(L: Lists, x: number, y: number, z: number, k: number, rnd: Rnd, color = 0xffffff) {
   for (let p = 0; p < 4; p++) {
     const r = (4 + rnd() * 4) * k;
-    part(L.props, GEO.ico, 0xffffff, x + (p - 1.5) * 4.5 * k, y + rnd() * 2 * k, z + (rnd() - 0.5) * 4 * k, r * 1.4, r, r);
+    part(L.props, GEO.ico, color, x + (p - 1.5) * 4.5 * k, y + rnd() * 2 * k, z + (rnd() - 0.5) * 4 * k, r * 1.4, r, r);
   }
 }
 
@@ -256,6 +310,68 @@ export function makePlane(look: PlaneLook): PlaneModel {
       spinMat.dispose();
     },
   };
+}
+
+// ── Moving hazards (each is its own small mesh so it can move) ─────────────
+
+export interface HazardModel {
+  mesh: THREE.Object3D;
+  /** How close (metres) the plane can get before it bonks. */
+  radius: number;
+  dispose: () => void;
+}
+
+function single(list: THREE.BufferGeometry[], mat: THREE.Material): THREE.Mesh {
+  const g = mergeGeometries(list, false);
+  for (const p of list) p.dispose();
+  const m = new THREE.Mesh(g, mat);
+  m.castShadow = true;
+  return m;
+}
+
+/** A little flock of three birds, wings out. */
+export function birdFlock(mat: THREE.Material): HazardModel {
+  const L: THREE.BufferGeometry[] = [];
+  for (const [ox, oy, oz] of [[0, 0, 0], [-3.5, -0.8, 2.5], [3.5, -0.8, 2.5]]) {
+    part(L, GEO.sphere, 0x3a3a48, ox, oy, oz, 1.2, 1, 2.4);
+    part(L, GEO.box, 0x55556a, ox - 1.6, oy + 0.3, oz, 2.6, 0.2, 1.2, 0, 0, 0.3);
+    part(L, GEO.box, 0x55556a, ox + 1.6, oy + 0.3, oz, 2.6, 0.2, 1.2, 0, 0, -0.3);
+    part(L, GEO.cone, 0xffb02e, ox, oy, oz - 1.6, 0.4, 0.8, 0.4, -Math.PI / 2, 0, 0);
+  }
+  const m = single(L, mat);
+  return { mesh: m, radius: 6.5, dispose: () => m.geometry.dispose() };
+}
+
+export function fireball(glow: THREE.Material): HazardModel {
+  const L: THREE.BufferGeometry[] = [];
+  part(L, GEO.ico, 0xffd23a, 0, 0, 0, 4, 4, 4);
+  part(L, GEO.ico, 0xff6a1a, 0, -1.8, 0, 3.2, 4.4, 3.2);
+  part(L, GEO.cone, 0xff3a1a, 0, -5, 0, 2.6, 5, 2.6, Math.PI, 0, 0);
+  const m = single(L, glow);
+  m.castShadow = false;
+  return { mesh: m, radius: 5.5, dispose: () => m.geometry.dispose() };
+}
+
+export function stormCloud(mat: THREE.Material, rnd: Rnd): HazardModel {
+  const L: THREE.BufferGeometry[] = [];
+  for (let p = 0; p < 5; p++) {
+    const r = 5 + rnd() * 3;
+    part(L, GEO.ico, p % 2 ? 0x4a5060 : 0x5a6070, (p - 2) * 4.5, rnd() * 2, (rnd() - 0.5) * 4, r * 1.3, r, r);
+  }
+  // Zig-zag lightning bolt underneath
+  part(L, GEO.box, 0xfff27a, 0, -7, 0, 0.8, 5, 0.8, 0, 0, 0.4);
+  part(L, GEO.box, 0xfff27a, 1.2, -11, 0, 0.8, 5, 0.8, 0, 0, -0.4);
+  const m = single(L, mat);
+  return { mesh: m, radius: 9, dispose: () => m.geometry.dispose() };
+}
+
+export function asteroid(mat: THREE.Material, rnd: Rnd): HazardModel {
+  const L: THREE.BufferGeometry[] = [];
+  const k = 4 + rnd() * 2.5;
+  part(L, GEO.rock, vary(0x7d6a5c, rnd), 0, 0, 0, k * 1.2, k, k * 1.1, rnd(), rnd(), rnd());
+  part(L, GEO.rock, vary(0x5e4f45, rnd), k * 0.4, k * 0.3, 0, k * 0.5, k * 0.4, k * 0.5, rnd(), rnd(), rnd());
+  const m = single(L, mat);
+  return { mesh: m, radius: k * 0.55 + 3, dispose: () => m.geometry.dispose() };
 }
 
 /** A hot-air balloon — the thing to dodge. About 10 m tall. */
